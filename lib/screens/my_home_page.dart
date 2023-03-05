@@ -70,7 +70,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   }
 
-
   Future<void> getDeviceTokenToSendNotification() async {
     final FirebaseMessaging _fcm = FirebaseMessaging.instance;
     final token = await _fcm.getToken();
@@ -95,18 +94,10 @@ class _MyHomePageState extends State<MyHomePage> {
       animationDuration: const Duration(milliseconds: 300),
       animateChildDecoration: true,
       rtlOpening: false,
-      // openScale: 1.0,
+
       disabledGestures: false,
       childDecoration: const BoxDecoration(
-        // NOTICE: Uncomment if you want to add shadow behind the page.
-        // Keep in mind that it may cause animation jerks.
-        // boxShadow: <BoxShadow>[
-        //   BoxShadow(
-        //     color: Colors.black12,
-        //     blurRadius: 0.0,
-        //   ),
-        // ],
-        borderRadius: const BorderRadius.all(Radius.circular(16)),
+        borderRadius: BorderRadius.all(Radius.circular(16)),
       ),
       drawer: SafeArea(
         child: Container(
@@ -124,7 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     bottom: 64.0,
                   ),
                   clipBehavior: Clip.antiAlias,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.black26,
                     shape: BoxShape.circle,
                   ),
@@ -138,9 +129,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   title: Text('Home'),
                 ),
                 ListTile(
-                  onTap: () {},
-                  leading: Icon(Icons.account_circle_rounded),
-                  title: Text('Profile'),
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => const SelectUploadType(),));
+                  },
+                  leading: Icon(Icons.upload),
+                  title: Text('Upload'),
                 ),
                 ListTile(
                   onTap: () {},
@@ -154,7 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 Spacer(),
                 DefaultTextStyle(
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
                     color: Colors.white54,
                   ),
@@ -162,7 +156,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     margin: const EdgeInsets.symmetric(
                       vertical: 16.0,
                     ),
-                    child: Text('Terms of Service | Privacy Policy'),
+                    child: const Text('Unknown Developer'),
                   ),
                 ),
               ],
@@ -243,13 +237,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   }
               );
             }
-          },
-        ),
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add, color: Colors.black,),
-          onPressed: () {
-            Navigator.push(context, MaterialPageRoute(
-              builder: (context) => const SelectUploadType(),));
           },
         ),
       ),
