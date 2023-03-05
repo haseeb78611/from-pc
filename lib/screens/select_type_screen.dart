@@ -4,7 +4,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
-import '../Widgets/internet_connection_checker.dart';
 
 class SelectTypeScreen extends StatefulWidget {
   final String semester;

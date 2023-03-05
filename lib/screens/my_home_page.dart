@@ -5,7 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
-import '../Widgets/internet_connection_checker.dart';
+import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import '../notificationservice/local_notification_service.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -16,6 +16,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final _advancedDrawerController = AdvancedDrawerController();
   final database =  FirebaseDatabase.instance.ref();
   String deviceTokenToSendPushNotification = '';
   Connectivity connectivity = Connectivity();
@@ -69,71 +70,191 @@ class _MyHomePageState extends State<MyHomePage> {
 
   }
 
+
   Future<void> getDeviceTokenToSendNotification() async {
     final FirebaseMessaging _fcm = FirebaseMessaging.instance;
     final token = await _fcm.getToken();
+
     deviceTokenToSendPushNotification = token.toString();
     print("Token Value $deviceTokenToSendPushNotification");
   }
 
+  void _handleMenuButtonPressed() {
+    // NOTICE: Manage Advanced Drawer state through the Controller.
+    // _advancedDrawerController.value = AdvancedDrawerValue.visible();
+    _advancedDrawerController.showDrawer();
+  }
   @override
   Widget build(BuildContext context) {
     getDeviceTokenToSendNotification();
-    return Scaffold(
-      appBar:AppBar(
-        title: Text(''),
+
+    return AdvancedDrawer(
+      backdropColor: Colors.brown,
+      controller: _advancedDrawerController,
+      animationCurve: Curves.easeInOut,
+      animationDuration: const Duration(milliseconds: 300),
+      animateChildDecoration: true,
+      rtlOpening: false,
+      // openScale: 1.0,
+      disabledGestures: false,
+      childDecoration: const BoxDecoration(
+        // NOTICE: Uncomment if you want to add shadow behind the page.
+        // Keep in mind that it may cause animation jerks.
+        // boxShadow: <BoxShadow>[
+        //   BoxShadow(
+        //     color: Colors.black12,
+        //     blurRadius: 0.0,
+        //   ),
+        // ],
+        borderRadius: const BorderRadius.all(Radius.circular(16)),
       ),
-      body: StreamBuilder(
-        stream: database.onValue,
-        builder: (context, AsyncSnapshot<DatabaseEvent> snapshot) {
-          if(snapshot.hasData){
-            var list = snapshot.data!.snapshot.children.toList();
-            return GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-              itemCount: list.length,
-              itemBuilder: (context, index) {
-                return InkWell(
-                  onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => SelectTypeScreen(semester: list[index].child('semester').value as String,)));
-                  },
-                  child: Card(
-                    color: Colors.blue,
-                    child:  Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [Text(
-                          list[index].child('semester').value as String,
-                          style: TextStyle(fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold),),
-                          Text('Semester',  style: TextStyle(fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold))
-                        ]
+      drawer: SafeArea(
+        child: Container(
+          child: ListTileTheme(
+            textColor: Colors.white,
+            iconColor: Colors.white,
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Container(
+                  width: 128.0,
+                  height: 128.0,
+                  margin: const EdgeInsets.only(
+                    top: 24.0,
+                    bottom: 64.0,
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(
+                    color: Colors.black26,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Image.asset(
+                    'assets/images/flutter_logo.png',
+                  ),
+                ),
+                ListTile(
+                  onTap: () {},
+                  leading: Icon(Icons.home),
+                  title: Text('Home'),
+                ),
+                ListTile(
+                  onTap: () {},
+                  leading: Icon(Icons.account_circle_rounded),
+                  title: Text('Profile'),
+                ),
+                ListTile(
+                  onTap: () {},
+                  leading: Icon(Icons.favorite),
+                  title: Text('Favourites'),
+                ),
+                ListTile(
+                  onTap: () {},
+                  leading: Icon(Icons.settings),
+                  title: Text('Settings'),
+                ),
+                Spacer(),
+                DefaultTextStyle(
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white54,
+                  ),
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(
+                      vertical: 16.0,
                     ),
+                    child: Text('Terms of Service | Privacy Policy'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(''),
+          leading: IconButton(
+            onPressed: _handleMenuButtonPressed,
+            icon: ValueListenableBuilder<AdvancedDrawerValue>(
+              valueListenable: _advancedDrawerController,
+              builder: (_, value, __) {
+                return AnimatedSwitcher(
+                  duration: Duration(milliseconds: 250),
+                  child: Icon(
+                    value.visible ? Icons.clear : Icons.menu,
+                    key: ValueKey<bool>(value.visible),
                   ),
                 );
-
-              },);
-          }
-          else{
-            return StreamBuilder<ConnectivityResult>(
-                stream: Connectivity().onConnectivityChanged,
-                builder: (context, snapshot) {
-                  if(snapshot.connectionState == ConnectionState.active){
-                    return Center(child: CircularProgressIndicator());
+              },
+            ),
+          ),
+        ),
+        body: StreamBuilder(
+          stream: database.onValue,
+          builder: (context, AsyncSnapshot<DatabaseEvent> snapshot) {
+            if (snapshot.hasData) {
+              var list = snapshot.data!.snapshot.children.toList();
+              return GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2),
+                itemCount: list.length,
+                itemBuilder: (context, index) {
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (
+                          context) =>
+                          SelectTypeScreen(semester: list[index]
+                              .child('semester')
+                              .value as String,)));
+                    },
+                    child: Card(
+                      color: Colors.blue,
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [Text(
+                            list[index]
+                                .child('semester')
+                                .value as String,
+                            style: TextStyle(fontSize: 30,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),),
+                            Text('Semester', style: TextStyle(fontSize: 30,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold))
+                          ]
+                      ),
+                    ),
+                  );
+                },);
+            }
+            else {
+              return StreamBuilder<ConnectivityResult>(
+                  stream: Connectivity().onConnectivityChanged,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.active) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    else {
+                      return Center(child: Icon(Icons
+                          .signal_wifi_statusbar_connected_no_internet_4_outlined,
+                        size: 200, color: Colors.black,));
+                    }
                   }
-                  else{
-                    return Center(child: Icon(Icons.signal_wifi_statusbar_connected_no_internet_4_outlined, size: 200, color: Colors.black,));
-                  }
-                }
-            );
-          }
-
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add, color: Colors.black,),
-        onPressed: (){
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const SelectUploadType(),));
-        },
+              );
+            }
+          },
+        ),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add, color: Colors.black,),
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) => const SelectUploadType(),));
+          },
+        ),
       ),
     );
   }
+
+
 }

@@ -10,7 +10,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 
-import '../Widgets/internet_connection_checker.dart';
 
 class SlidesScreen extends StatefulWidget {
   final query;
@@ -40,10 +39,12 @@ class _SlidesScreenState extends State<SlidesScreen> {
           print(await Connectivity().checkConnectivity());
           FileDownloader.downloadFile(url: url, name: fileName,
             onDownloadCompleted: (path) {
+              setState(() {loading = false;});
             print('File Downloaded');
               Toast().show('$fileName Downloaded');
             },
             onDownloadError: (errorMessage) {
+              setState(() {loading = false;});
               Toast().show(errorMessage);
             },
             onProgress: (fileName, progress) {
@@ -54,12 +55,16 @@ class _SlidesScreenState extends State<SlidesScreen> {
             },
           );
         }else{
+          setState(() {loading = false;});
           showDialog(context: context, builder: (context) {
             return InternetAlertDialog();
           },);
         }
+      }else{
+        setState(() {loading = false;});
       }
     }catch(e){
+      setState(() {loading = false;});
       print(e);
     }
   }
@@ -72,6 +77,7 @@ class _SlidesScreenState extends State<SlidesScreen> {
       var result = await permission.request();
       if(result ==  PermissionStatus.granted){
         Toast().show('Permission Granted');
+        setState(() {loading = true;});
         return true;
       }
       else{
@@ -84,7 +90,7 @@ class _SlidesScreenState extends State<SlidesScreen> {
    downloadFile(String url, String fileName) async {
     setState(() {loading = true;});
     await saveFile(url, fileName);
-    setState(() {loading = false;});
+
   }
   @override
   Widget build(BuildContext context) {
