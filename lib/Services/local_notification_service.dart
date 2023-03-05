@@ -19,7 +19,7 @@ class LocalNotificationServic{
   }
   Future <void> initialize() async{
     const AndroidInitializationSettings androidInitializationSettings =
-          AndroidInitializationSettings('drawable');
+          AndroidInitializationSettings('@drawable');
     InitializationSettings settings = InitializationSettings(
       android: androidInitializationSettings
     );
