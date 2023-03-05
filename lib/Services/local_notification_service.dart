@@ -19,7 +19,7 @@ class LocalNotificationServic{
   }
   Future <void> initialize() async{
     const AndroidInitializationSettings androidInitializationSettings =
-          AndroidInitializationSettings('@drawable');
+          AndroidInitializationSettings('@drawable-hdpi/ic_stat_attach_money.png');
     InitializationSettings settings = InitializationSettings(
       android: androidInitializationSettings
     );
